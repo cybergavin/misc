@@ -1,0 +1,37 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Created By  : cybergavin
+; Created On  : 13-MAR-2020
+; Description : Quick'n'Dirty TTL script to connect to a PAN firewall and run diagnostics to troubleshoot issues.
+;               The diagnostic commands were provided in a TTL by PAN Support and the TTL was modified to include connection and logging.
+;               "pause" commands included to allow time for the receipt and processing of commands. May be modified or eliminated as required.
+; USER-DEFINED: Set values for the connection (server/username/password/keyfile) and log directory.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; Choose one of the following "connect" methods, set values and uncomment.
+;
+;connect 'myserver /ssh /2 /auth=password /user=username /passwd=password'
+;connect 'myserver /ssh /2 /auth=publickey /user=username /passwd=password /keyfile=private-key-file'
+;connect 'myserver /ssh /2 /auth=password /user=username /ask4passwd'
+pause 5 
+sendln 'set cli pager off'
+pause 1
+sendln 'set cli scripting-mode on'
+pause 1
+changedir 'S:\pandiag' ; Change directory to store logs
+;
+; Diagnostic loop
+;
+:diagloop
+	gettime logfile "pandiaglog-%Y%m%d-%H.txt"
+	logopen logfile 0 1
+	sendln 'show clock'
+	pause 1
+	sendln 'show counter global filter delta yes'
+	pause 1
+	sendln 'show running resource-monitor ingress-backlogs'
+	pause 1
+	sendln 'show running resource-monitor second last 10'
+	pause 1
+	logclose
+	pause 1
+	goto diagloop
