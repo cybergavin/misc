@@ -1,0 +1,1 @@
+INSERT INTO testdbcw.dbo.TEST(ID,NAME) VALUES (~~NUM~~,'~~TEST~~_~~NUM~~');
